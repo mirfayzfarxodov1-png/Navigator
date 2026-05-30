@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Navigator | Profil</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/cursor.css">
+    <link rel="stylesheet" href="css/scrollbar.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 100px auto 50px;
+            padding: 30px;
+        }
+        .profile-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+            text-align: center;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 20px;
+            box-shadow: 0 0 30px rgba(0,212,255,0.3);
+        }
+        .profile-name {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .profile-email {
+            color: var(--text-dim);
+            margin-bottom: 30px;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 16px;
+            padding: 15px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--neon-cyan);
+        }
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-top: 5px;
+        }
+        .info-list {
+            text-align: left;
+            margin: 20px 0;
+        }
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .info-label {
+            color: var(--text-dim);
+        }
+        .info-value {
+            font-weight: bold;
+            color: var(--neon-cyan);
+        }
+        .logout-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, var(--neon-red), #cc0044);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        .logout-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px var(--neon-red);
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        .back-btn:hover {
+            border-color: var(--neon-cyan);
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="earthCanvas"></canvas>
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+
+<button class="back-btn" onclick="window.location.href='index.html'">← Bosh sahifaga</button>
+
+<div class="profile-container">
+    <div class="profile-card anim-fadeInUp">
+        <div class="profile-avatar">
+            👤
+        </div>
+        <h1 class="profile-name">World Navigator Foydalanuvchisi</h1>
+        <p class="profile-email">user@worldnavigator.uz</p>
+        
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" id="favoritesCount">0</div>
+                <div class="stat-label">Sevimli joylar</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="searchesCount">0</div>
+                <div class="stat-label">Qidiruvlar</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" id="routesCount">0</div>
+                <div class="stat-label">Yo‘nalishlar</div>
+            </div>
+        </div>
+        
+        <div class="info-list">
+            <div class="info-item">
+                <span class="info-label">📅 Ro‘yxatdan o‘tgan</span>
+                <span class="info-value">2024-01-15</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">🌍 Sayohat qilingan davlatlar</span>
+                <span class="info-value" id="visitedCountries">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">📍 Qo‘shilgan joylar</span>
+                <span class="info-value" id="addedPlaces">0</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">⭐ Reyting</span>
+                <span class="info-value">4.8 ★</span>
+            </div>
+        </div>
+        
+        <button class="logout-btn" onclick="logout()">🚪 Chiqish</button>
+    </div>
+</div>
+
+<script src="js/3d-earth.js"></script>
+<script src="js/cursor.js"></script>
+<script src="js/storage.js"></script>
+
+<script>
+    function updateProfileStats() {
+        const favorites = getFavorites();
+        const history = getSearchHistory();
+        const routes = getRoutes();
+        const places = getPlaces();
+        
+        document.getElementById('favoritesCount').textContent = favorites.length;
+        document.getElementById('searchesCount').textContent = history.length;
+        document.getElementById('routesCount').textContent = routes.length;
+        document.getElementById('visitedCountries').textContent = Math.floor(Math.random() * 20) + 1;
+        document.getElementById('addedPlaces').textContent = places.length;
+    }
+    
+    function logout() {
+        if (confirm('Chiqishni xohlaysizmi?')) {
+            window.location.href = 'index.html';
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        updateProfileStats();
+    });
+</script>
+</body>
+</html>
