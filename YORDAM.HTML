@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Navigator | Yordam</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/cursor.css">
+    <link rel="stylesheet" href="css/scrollbar.css">
+    <style>
+        .help-container {
+            max-width: 900px;
+            margin: 100px auto 50px;
+            padding: 30px;
+        }
+        .help-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+        }
+        .help-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .faq-item {
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 15px;
+        }
+        .faq-question {
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--neon-cyan);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .faq-question:hover {
+            color: var(--neon-pink);
+        }
+        .faq-answer {
+            display: none;
+            padding-top: 10px;
+            color: var(--text-dim);
+            line-height: 1.6;
+        }
+        .faq-answer.active {
+            display: block;
+        }
+        .faq-icon {
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        .faq-question.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        .contact-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            z-index: 100;
+        }
+        .back-btn:hover {
+            border-color: var(--neon-cyan);
+        }
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .shortcut-item {
+            background: rgba(255,255,255,0.05);
+            padding: 8px 12px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .shortcut-key {
+            color: var(--neon-cyan);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="earthCanvas"></canvas>
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+
+<button class="back-btn" onclick="window.location.href='index.html'">← Bosh sahifaga</button>
+
+<div class="help-container">
+    <div class="help-card anim-fadeInUp">
+        <h1 class="help-title">❓ Yordam</h1>
+        
+        <h2 style="margin: 20px 0 15px;">📋 Tezkor tugmalar</h2>
+        <div class="shortcuts-grid">
+            <div class="shortcut-item"><span>🔍 Qidiruvga o‘tish</span><span class="shortcut-key">Ctrl + F</span></div>
+            <div class="shortcut-item"><span>🏠 Bosh sahifa</span><span class="shortcut-key">Alt + H</span></div>
+            <div class="shortcut-item"><span>👤 Profil</span><span class="shortcut-key">Alt + P</span></div>
+            <div class="shortcut-item"><span>⚙️ Sozlamalar</span><span class="shortcut-key">Alt + S</span></div>
+            <div class="shortcut-item"><span>❓ Yordam</span><span class="shortcut-key">F1</span></div>
+            <div class="shortcut-item"><span>🌍 3D Yerni aylantirish</span><span class="shortcut-key">Sichqoncha</span></div>
+            <div class="shortcut-item"><span>🗺️ Kattalashtirish</span><span class="shortcut-key">Scroll</span></div>
+            <div class="shortcut-item"><span>🔴 Live rejim</span><span class="shortcut-key">Ctrl + L</span></div>
+        </div>
+        
+        <h2 style="margin: 30px 0 15px;">💡 Ko‘p so‘raladigan savollar</h2>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>📍 Qanday qilib joy qo‘shaman?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                Joy qo‘shish uchun asosiy sahifadagi dialog oynasida "Ha, qo‘shaman" tugmasini bosing. Keyin joy nomi, manzili va koordinatalarini kiriting.
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>🛣️ Eng oson yo‘lni qanday topaman?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                Joyni tanlagandan keyin "Eng oson yo‘lni topish" tugmasini bosing. Tizim sizning joylashuvingizdan tanlangan joygacha eng qisqa va eng tez yo‘lni hisoblab beradi.
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>🌐 3D Yerni qanday boshqaraman?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                3D Yerni sichqoncha bilan sudrab aylantirishingiz, sichqoncha g‘ildiragi bilan kattalashtirishingiz yoki kichraytirishingiz mumkin. Yer avtomatik ravishda aylanib turadi.
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>🔴 Live rejim nima?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                Live rejim real vaqtda ob-havo, harorat, shamol, namlik va tirbandlik ma’lumotlarini yangilab turadi. Ma’lumotlar har 2 sekundda yangilanadi.
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>📱 Mobil versiyasi bormi?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                Ha, World Navigator to‘liq mobil qurilmalarga moslashtirilgan. Telefoningiz brauzeridan ochib foydalanishingiz mumkin.
+            </div>
+        </div>
+        
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFAQ(this)">
+                <span>💾 Ma’lumotlarim qayerda saqlanadi?</span>
+                <span class="faq-icon">▼</span>
+            </div>
+            <div class="faq-answer">
+                Barcha ma’lumotlaringiz brauzeringizning LocalStorage qismida saqlanadi. Sozlamalar sahifasidan ma’lumotlaringizni eksport qilishingiz mumkin.
+            </div>
+        </div>
+        
+        <div class="contact-section">
+            <h3>📞 Biz bilan bog‘lanish</h3>
+            <p>Savollaringiz bo‘lsa, bizga yozing: <span style="color: var(--neon-cyan);">support@worldnavigator.uz</span></p>
+            <p>Telegram: <span style="color: var(--neon-cyan);">@worldnavigator_bot</span></p>
+        </div>
+    </div>
+</div>
+
+<script src="js/3d-earth.js"></script>
+<script src="js/cursor.js"></script>
+
+<script>
+    function toggleFAQ(element) {
+        element.classList.toggle('active');
+        const answer = element.nextElementSibling;
+        answer.classList.toggle('active');
+    }
+</script>
+</body>
+</html>
