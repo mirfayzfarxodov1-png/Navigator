@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Navigator | Sozlamalar</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    <link rel="stylesheet" href="css/cursor.css">
+    <link rel="stylesheet" href="css/scrollbar.css">
+    <style>
+        .settings-container {
+            max-width: 700px;
+            margin: 100px auto 50px;
+            padding: 30px;
+        }
+        .settings-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            border-radius: 24px;
+            border: 1px solid var(--glass-border);
+            padding: 30px;
+        }
+        .settings-title {
+            font-size: 28px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .setting-group {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .setting-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        .setting-label span:first-child {
+            font-size: 16px;
+            font-weight: bold;
+        }
+        .toggle-switch {
+            width: 50px;
+            height: 24px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .toggle-switch.active {
+            background: var(--neon-cyan);
+        }
+        .toggle-switch::after {
+            content: '';
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            transition: all 0.3s;
+        }
+        .toggle-switch.active::after {
+            left: 26px;
+        }
+        select, input[type="range"] {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: white;
+            margin-top: 10px;
+        }
+        .save-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-purple));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .save-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 10px 20px;
+            color: white;
+            cursor: pointer;
+            z-index: 100;
+        }
+        .back-btn:hover {
+            border-color: var(--neon-cyan);
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="earthCanvas"></canvas>
+<div class="cursor-dot"></div>
+<div class="cursor-outline"></div>
+
+<button class="back-btn" onclick="window.location.href='index.html'">← Bosh sahifaga</button>
+
+<div class="settings-container">
+    <div class="settings-card anim-fadeInUp">
+        <h1 class="settings-title">⚙️ Sozlamalar</h1>
+        
+        <div class="setting-group">
+            <div class="setting-label" onclick="toggleTheme()">
+                <span>🌙 Qorong‘u rejim</span>
+                <div class="toggle-switch" id="themeToggle"></div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <div class="setting-label" onclick="toggleLive()">
+                <span>🔴 Live rejim</span>
+                <div class="toggle-switch" id="liveToggle"></div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <div class="setting-label" onclick="toggleSound()">
+                <span>🔊 Ovoz effektlari</span>
+                <div class="toggle-switch" id="soundToggle"></div>
+            </div>
+        </div>
+        
+        <div class="setting-group">
+            <label>🌐 Til</label>
+            <select id="languageSelect">
+                <option value="uz">O‘zbekcha</option>
+                <option value="ru">Русский</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+        
+        <div class="setting-group">
+            <label>🗺️ Xarita turi</label>
+            <select id="mapTypeSelect">
+                <option value="standard">Standart</option>
+                <option value="satellite">Sun’iy yo‘ldosh</option>
+                <option value="terrain">Relyef</option>
+            </select>
+        </div>
+        
+        <div class="setting-group">
+            <label>📏 O‘lchov birligi</label>
+            <select id="unitSelect">
+                <option value="metric">Metrik (km, m)</option>
+                <option value="imperial">Imperial (mil, fut)</option>
+            </select>
+        </div>
+        
+        <div class="setting-group">
+            <label>⏱️ Animatsiya tezligi</label>
+            <input type="range" id="animationSpeed" min="0.5" max="2" step="0.1" value="1">
+            <div style="text-align: center; margin-top: 5px;" id="speedValue">1x</div>
+        </div>
+        
+        <button class="save-btn" onclick="saveSettings()">💾 Sozlamalarni saqlash</button>
+        
+        <button class="save-btn" onclick="exportData()" style="background: linear-gradient(45deg, #00ff88, #00cc66); margin-top: 10px;">📤 Ma’lumotlarni eksport qilish</button>
+        
+        <button class="save-btn" onclick="clearData()" style="background: linear-gradient(45deg, #ff3366, #cc0044); margin-top: 10px;">🗑️ Barcha ma’lumotlarni tozalash</button>
+    </div>
+</div>
+
+<script src="js/3d-earth.js"></script>
+<script src="js/cursor.js"></script>
+<script src="js/storage.js"></script>
+
+<script>
+    let settings = getSettings();
+    
+    function applySettings() {
+        document.getElementById('themeToggle').classList.toggle('active', settings.theme === 'dark');
+        document.getElementById('liveToggle').classList.toggle('active', settings.liveUpdates);
+        document.getElementById('soundToggle').classList.toggle('active', settings.soundEffects);
+        document.getElementById('languageSelect').value = settings.language;
+        document.getElementById('mapTypeSelect').value = settings.mapType || 'standard';
+        document.getElementById('unitSelect').value = settings.measurementUnit;
+        document.getElementById('animationSpeed').value = settings.animationSpeed || 1;
+        document.getElementById('speedValue').innerText = (settings.animationSpeed || 1) + 'x';
+        
+        if (settings.theme === 'dark') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+    }
+    
+    function toggleTheme() {
+        settings.theme = settings.theme === 'dark' ? 'light' : 'dark';
+        applySettings();
+    }
+    
+    function toggleLive() {
+        settings.liveUpdates = !settings.liveUpdates;
+        applySettings();
+    }
+    
+    function toggleSound() {
+        settings.soundEffects = !settings.soundEffects;
+        applySettings();
+    }
+    
+    function saveSettings() {
+        settings.language = document.getElementById('languageSelect').value;
+        settings.mapType = document.getElementById('mapTypeSelect').value;
+        settings.measurementUnit = document.getElementById('unitSelect').value;
+        settings.animationSpeed = parseFloat(document.getElementById('animationSpeed').value);
+        
+        saveSettings(settings);
+        alert('✅ Sozlamalar saqlandi!');
+    }
+    
+    function exportData() {
+        exportAllData();
+    }
+    
+    function clearData() {
+        if (confirm('Rostan ham barcha ma’lumotlarni tozalamoqchimisiz? Bu amalni qaytarib bo‘lmaydi!')) {
+            clearAllData();
+            alert('✅ Barcha ma’lumotlar tozalandi!');
+            window.location.reload();
+        }
+    }
+    
+    document.getElementById('animationSpeed').addEventListener('input', function() {
+        document.getElementById('speedValue').innerText = this.value + 'x';
+    });
+    
+    applySettings();
+</script>
+</body>
+</html>
